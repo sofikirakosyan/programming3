@@ -63,7 +63,6 @@ function MatrixGenerator(size, countGrass, countGrassEater, predatorCount, tiger
         //     k--
         // }
     }
-    console.log(matrix)
 }
 
 function setup() {
@@ -96,13 +95,11 @@ function setup() {
             }
         }
     }
-    console.log(matrix);
 }
 
 
 
 function draw() {
-    console.log(matrix)
     for (var y = 0; y < matrix.length; y++) {
         for (var x = 0; x < matrix[y].length; x++) {
             if (matrix[y][x] == 1) {
