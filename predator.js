@@ -1,4 +1,5 @@
-class predator extends Grass{
+let Predator = require('./predator');
+module.exports = class predator extends Grass{
     constructor(x, y, index) {
     super(x,y,index)
         this.energy = 8;
@@ -23,7 +24,7 @@ class predator extends Grass{
     }
 
     mul() {
-        var newCell = random(this.chooseCell(0)); 
+        var newCell = this.random(this.chooseCell(0)); 
         if (newCell) { 
             var newGrassE = new GrassEater(newCell[0], newCell[1], 3); 
             grassEaterArr.push(newGrassE); 
@@ -37,7 +38,7 @@ class predator extends Grass{
             this.energy--;
     
             let emptyCells = this.chooseCell(0)
-            let oneEmptyCell = random(emptyCells)
+            let oneEmptyCell = this.random(emptyCells)
             if (oneEmptyCell) {
                 matrix[this.y][this.x] = 0
                 let newX = oneEmptyCell[0]
@@ -52,7 +53,7 @@ class predator extends Grass{
     }
     eat() {
         let grasses = this.chooseCell(2)
-        let oneGrass = random(grasses)
+        let oneGrass = this.random(grasses)
         if (oneGrass) {
             this.energy++;
             matrix[this.y][this.x] = 0;

@@ -1,6 +1,8 @@
-class GrassEater extends Grass {
+let Grass = require('./grass');
+
+module.exports = class GrassEater extends Grass {
     constructor(x, y, index) {
-    super(x,y,index);
+        super(x, y, index);
         this.energy = 18;
         this.directions = [];
     }
@@ -22,10 +24,10 @@ class GrassEater extends Grass {
         return super.chooseCell(character);
     }
 
-    
+
 
     mul() {
-        var newCell = random(this.chooseCell(0));
+        var newCell = this.random(this.chooseCell(0));
 
         if (newCell) {
 
@@ -38,12 +40,16 @@ class GrassEater extends Grass {
         }
 
     }
+    random(arr) {
+        let result = Math.floor(Math.random() * arr.lenght)
+        return arr(result)
+    }
 
     move() {
         if (this.energy > 0) {
             this.energy--;
             let emptyCells = this.chooseCell(0)
-            let oneEmptyCell = random(emptyCells)
+            let oneEmptyCell = this.random(emptyCells)
             if (oneEmptyCell) {
                 matrix[this.y][this.x] = 0
                 let newX = oneEmptyCell[0]
@@ -54,11 +60,11 @@ class GrassEater extends Grass {
 
             }
         }
-        
+
     }
     eat() {
         let grasses = this.chooseCell(1)
-        let oneGrass = random(grasses)
+        let oneGrass = this.random(grasses)
         if (oneGrass) {
             this.energy++;
             matrix[this.y][this.x] = 0;

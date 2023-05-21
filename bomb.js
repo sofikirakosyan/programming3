@@ -1,6 +1,6 @@
 //ays kerpar@ tigeri char tesakn e 
-
-class Bomb extends Grass {
+let Bomb = require('./Bomb');
+module.exports = class Bomb extends Grass {
     constructor(x, y,index) {
         super(x,y,index)
         this.energy = 40;
@@ -27,7 +27,7 @@ class Bomb extends Grass {
 
     mul() {
         var found = this.chooseCell(0);
-        var newCell = random(found);
+        var newCell = this.random(found);
 
         if (newCell && this.energy >= 10) {
             var newX = newCell[0];
@@ -40,7 +40,7 @@ class Bomb extends Grass {
 
     move() {
         var found = this.chooseCell(0);
-        var newCell = random(found);
+        var newCell = this.random(found);
 
         if (newCell) {
             var newX = newCell[0];
@@ -61,7 +61,7 @@ class Bomb extends Grass {
 
     eat() {
         var found = this.chooseCell(1, 2, 4);
-        var newCell = random(found);
+        var newCell = this.random(found);
 
         if (newCell) {
             var newX = newCell[0];

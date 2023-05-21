@@ -1,6 +1,7 @@
 //tiger@ mi kerpar e vor@ir yetevic toxnum e grass
 //uni mi shat hetaqrqir arancnahatkutyun
-class Tiger extends Grass {
+let Tiger = require('./Tiger')
+module.exports = class Tiger extends Grass {
     constructor(x, y, index) {
         super(x, y, index)
         this.energy = 20;
@@ -26,7 +27,7 @@ class Tiger extends Grass {
 
     mul() {
         if (this.energy >= 10) {
-            var newCell = random(this.chooseCell(0))
+            var newCell = this.random(this.chooseCell(0))
             if (newCell) { //[3,4]
                 var newtiger = new Tiger(newCell[0], newCell[1]);
                 tigerArr.push(newtiger);
@@ -37,14 +38,12 @@ class Tiger extends Grass {
     }
 
 
-
-
     move() {
         if (this.energy > 0) {
             this.getNewCoordinates()
             this.energy--;
             let emptyCells = this.chooseCell(0)
-            let oneEmptyCell = random(emptyCells)
+            let oneEmptyCell = this.random(emptyCells)
             if (oneEmptyCell) {
                 matrix[this.y][this.x] = 1;
                 let newX = oneEmptyCell[0]
@@ -67,7 +66,7 @@ class Tiger extends Grass {
         let tigerAb = this.chooseCell(3)
         let tigerGrEat = this.chooseCell(2)
         let all = tigerAb.concat(tigerGrEat)
-        let onetiger = random(all)
+        let onetiger = this.random(all)
         if (onetiger) {
             this.energy++;
             matrix[this.y][this.x] = 0;
