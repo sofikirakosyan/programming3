@@ -1,8 +1,8 @@
 //ays kerpar@ tigeri char tesakn e 
-let Bomb = require('./Bomb');
+let Grass = require('./grass');
 module.exports = class Bomb extends Grass {
-    constructor(x, y,index) {
-        super(x,y,index)
+    constructor(x, y, index) {
+        super(x, y, index)
         this.energy = 40;
         this.directions = [];
     }

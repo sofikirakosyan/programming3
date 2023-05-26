@@ -1,4 +1,4 @@
-let Predator = require('./predator');
+let Grass = require('./grass');
 module.exports = class predator extends Grass{
     constructor(x, y, index) {
     super(x,y,index)

@@ -24,8 +24,6 @@ module.exports = class GrassEater extends Grass {
         return super.chooseCell(character);
     }
 
-
-
     mul() {
         var newCell = this.random(this.chooseCell(0));
 
@@ -40,10 +38,6 @@ module.exports = class GrassEater extends Grass {
         }
 
     }
-    random(arr) {
-        let result = Math.floor(Math.random() * arr.lenght)
-        return arr(result)
-    }
 
     move() {
         if (this.energy > 0) {
@@ -51,13 +45,12 @@ module.exports = class GrassEater extends Grass {
             let emptyCells = this.chooseCell(0)
             let oneEmptyCell = this.random(emptyCells)
             if (oneEmptyCell) {
-                matrix[this.y][this.x] = 0
+                matrix[this.y][this.x] = 0;
                 let newX = oneEmptyCell[0]
                 let newY = oneEmptyCell[1]
-                matrix[newY][newX] = 2
-                this.x = newX
-                this.y = newY
-
+                matrix[newY][newX] = 2;
+                this.x = newX;
+                this.y = newY;
             }
         }
 

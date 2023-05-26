@@ -1,6 +1,6 @@
 //tiger@ mi kerpar e vor@ir yetevic toxnum e grass
 //uni mi shat hetaqrqir arancnahatkutyun
-let Tiger = require('./Tiger')
+let Grass = require('./grass')
 module.exports = class Tiger extends Grass {
     constructor(x, y, index) {
         super(x, y, index)

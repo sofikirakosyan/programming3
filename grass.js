@@ -32,12 +32,16 @@ module.exports = class Grass {
     mul() {
         this.multiply++;
         let aaa = this.chooseCell(0)
-        var newCell = random(aaa);
+        var newCell = this.random(aaa);
         if (this.multiply >= 8 && newCell) {
             var newGrass = new Grass(newCell[0], newCell[1], 1);
             grassArr.push(newGrass);
             matrix[newCell[1]][newCell[0]] = 1;
             this.multiply = 0;
         }
+    }
+    random(arr) {
+        let result = Math.floor(Math.random() * arr.length)
+        return arr[result]
     }
 }
