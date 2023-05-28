@@ -1,109 +1,67 @@
-//tiger@ mi kerpar e vor@ir yetevic toxnum e grass
-//uni mi shat hetaqrqir arancnahatkutyun
-let Grass = require('./grass')
-module.exports = class Tiger extends Grass {
-    constructor(x, y, index) {
-        super(x, y, index)
-        this.energy = 20;
-        this.directions = [];
-    }
-    getNewCoordinates() {
-        this.directions = [
-            [this.x - 1, this.y - 1],
-            [this.x, this.y - 1],
-            [this.x + 1, this.y - 1],
-            [this.x - 1, this.y],
-            [this.x + 1, this.y],
-            [this.x - 1, this.y + 1],
-            [this.x, this.y + 1],
-            [this.x + 1, this.y + 1]
-        ];
+let Grass = require("./Grass")
+
+module.exports = class Tiger extends Grass{ 
+    constructor(x,y){
+        super(x,y, 34);
+
+        this.effectRadius = 2; 
+        this.spreadRadius = 1; 
+        this.id = 5; 
+        this.weatherChanged(currentWeather)
     }
 
-    chooseCell(character) {
-        this.getNewCoordinates()
-        return super.chooseCell(character)
-    }
+    move(){
+        if (++this.step < this.moveSpeed) return;
 
-    mul() {
-        if (this.energy >= 10) {
-            var newCell = this.random(this.chooseCell(0))
-            if (newCell) { //[3,4]
-                var newtiger = new Tiger(newCell[0], newCell[1]);
-                tigerArr.push(newtiger);
-                matrix[newCell[1]][newCell[0]] = 4;
-                this.energy = 2;
-            }
-        }
-    }
+        let grass = [];
 
-
-    move() {
-        if (this.energy > 0) {
-            this.getNewCoordinates()
-            this.energy--;
-            let emptyCells = this.chooseCell(0)
-            let oneEmptyCell = this.random(emptyCells)
-            if (oneEmptyCell) {
-                matrix[this.y][this.x] = 1;
-                let newX = oneEmptyCell[0]
-                let newY = oneEmptyCell[1]
-                matrix[newY][newX] = 4;
-                this.x = newX
-                this.y = newY
-
-            }
-        }
-        else {
-            this.die()
-        }
-    }
-    //na utum e xotaker ev gishatich
-    //arancnahatkutyun 1-nra imastn ayn e wor hamerashx apri xoteri het,dra hamar nra energian skzbum 30 e
-    //na aynqan e kangnum ev spasum minchev ir koghqi 8 vandaknerum hajtnvi xotaker kam gishatich;
-    eat() {
-        this.getNewCoordinates()
-        let tigerAb = this.chooseCell(3)
-        let tigerGrEat = this.chooseCell(2)
-        let all = tigerAb.concat(tigerGrEat)
-        let onetiger = this.random(all)
-        if (onetiger) {
-            this.energy++;
-            matrix[this.y][this.x] = 0;
-            let onetigerX = onetiger[0];
-            let onetigerY = onetiger[1];
-            matrix[onetigerY][onetigerX] = 4;
-            this.x = onetigerX;
-            this.y = onetigerY;
-            for (var i in grassEaterArr) {
-                if (onetigerX == grassEaterArr[i].x && onetigerY == grassEaterArr[i].y) {
-                    grassEaterArr.splice(i, 1);
-                    break;
+        for (let xx = this.x - this.effectRadius; xx < this.x + this.effectRadius; xx++) {
+            for (let yy = this.y - this.effectRadius; yy < this.y + this.effectRadius; yy++) {
+                if(this.isValid(xx,yy)){
+                   if(matrix[yy][xx] == 1){
+                        grass.push([xx,yy]) 
+                        grassSprayed++;
+                   } 
+                   else if(matrix[yy][xx] == 98) this.remove(xx,yy); 
                 }
             }
-            for (var i in predatorArr) {
-                if (onetigerX == predatorArr[i].x && onetigerY == predatorArr[i].y) {
-                    predatorArr.splice(i, 1);
-                    break;
-                }
+        }
+        
+        for(let i in grass){
+            this.spreadGrass(grass[i][0], grass[i][1]);
+        }
+        this.step = 0;
+    }
+
+    spreadGrass(x, y) {
+        for (let xx = x - this.spreadRadius; xx < x + this.spreadRadius; xx++){
+            for (let yy = y - this.spreadRadius; yy < y + this.spreadRadius; yy++){
+                if(this.isValid(xx,yy) && matrix[yy][xx] == 0) GlobalMethods.changeMatrix(xx, yy, 1, true) 
             }
-
-
-        } else {
-            this.move()
-
         }
     }
 
-
-    die() {
-        matrix[this.y][this.x] = 0;
-        for (var i in tigerArr) {
-            if (this.x == tigerArr[i].x && this.y == tigerArr[i].y) {
-                tigerArr.splice(i, 1);
-                break;
-            }
+    weatherChanged(weather){
+        switch(weather){
+            case "Spring":
+                this.moveSpeed = 34;
+                this.spreadRadius = 1;
+                this.effectRadius = 2;
+                return;
+            case "Summer":
+                this.moveSpeed = 28;
+                this.spreadRadius = 2;
+                this.effectRadius = 3;
+                return;
+            case "Fall":
+                this.moveSpeed = 36;
+                this.spreadRadius = 1;
+                this.effectRadius = 2;
+                return;
+            case "Winter":
+                this.moveSpeed = 38;
+                this.spreadRadius = 1;
+                this.effectRadius = 1;
         }
     }
 }
-

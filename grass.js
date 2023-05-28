@@ -1,8 +1,9 @@
 module.exports = class Grass {
-    constructor(x, y) {
+    constructor(x, y, moveSpeed) {
         this.x = x;
         this.y = y;
-        this.multiply = 0;
+        this.moveSpeed = moveSpeed;
+        this.step = 0;
         this.directions = [
             [this.x - 1, this.y - 1],
             [this.x, this.y - 1],
@@ -15,13 +16,13 @@ module.exports = class Grass {
         ];
     }
 
-    chooseCell(character) {
+    chooseCell(number) {
         var found = [];
         for (var i in this.directions) {
             var x = this.directions[i][0];
             var y = this.directions[i][1];
-            if (x >= 0 && x < matrix[0].length && y >= 0 && y < matrix.length) {
-                if (matrix[y][x] == character) {
+            if (this.isValid(x,y)) {
+                if (matrix[y][x] == number) {
                     found.push(this.directions[i]);
                 }
             }
@@ -29,19 +30,34 @@ module.exports = class Grass {
         return found;
 
     }
-    mul() {
-        this.multiply++;
-        let aaa = this.chooseCell(0)
-        var newCell = this.random(aaa);
-        if (this.multiply >= 8 && newCell) {
-            var newGrass = new Grass(newCell[0], newCell[1], 1);
-            grassArr.push(newGrass);
-            matrix[newCell[1]][newCell[0]] = 1;
-            this.multiply = 0;
-        }
+    //tarmacnum e coordinatnery
+    changeCoords(x,y){
+        this.x = x;
+        this.y = y;
+        this.directions = [
+            [this.x - 1, this.y - 1],
+            [this.x, this.y - 1],
+            [this.x + 1, this.y - 1],
+            [this.x - 1, this.y],
+            [this.x + 1, this.y],
+            [this.x - 1, this.y + 1],
+            [this.x, this.y + 1],
+            [this.x + 1, this.y + 1]
+        ];
     }
+
+    remove(x,y, from){
+        GlobalMethods.deleteObject(x,y)
+        GlobalMethods.changeMatrix(x,y, 0, false, from);
+    }
+
+    isValid(x,y){
+        return x >= 0 && y >= 0 && y < matrix.length && x < matrix[y].length;
+    }
+
     random(arr) {
         let result = Math.floor(Math.random() * arr.length)
-        return arr[result]
+        return arr[result];
     }
 }
+

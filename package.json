@@ -2,7 +2,7 @@
   "name": "programming3",
   "version": "1.0.0",
   "description": "",
-  "main": "bomb.js",
+  "main": "server.js",
   "dependencies": {
     "accepts": "^1.3.8",
     "array-flatten": "^1.1.1",
@@ -70,7 +70,7 @@
     "type": "git",
     "url": "git+https://github.com/sofikirakosyan/programming3.git"
   },
-  "author": "",
+  "author": "sofikirakosyan",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/sofikirakosyan/programming3/issues"

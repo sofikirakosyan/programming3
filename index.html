@@ -1,17 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 </head>
-
 <body>
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/p5@1.6.0/lib/p5.js"></script>
-    <script src="script.js"></script>
-</body>
+    <p>Cheat mode: <input type="checkbox" id ="cheatButton"> </p>
 
+    <div id="cheatSheet" hidden="true">
+        <h6>Click Radius: <input type="number" min="0" max="10" value="0" id="clickRadiusRange"></h6>
+
+        <h6>Add Object: <select name="" id="toIndex">
+            <option value="Grass">Grass</option>
+            <option value="GrassEater">GrassEater</option>
+            <option value="Predator">Predator</option>
+            <option value="Tiger">Tiger</option>
+            <option value="Bomb">Bomb</option>
+            <option value="Time">Time</option>
+            <option value="Fire">Fire</option>
+        </select></h6>
+        
+    </div>
+
+
+    <h4>Statistics</h4>
+    <p id="grassEaten">Grass Eaten:</p>
+    <p id="grassBurnt">Grass Burnt:</p>
+    <p id="grassEaterEaten">Grass Eaters Eaten:</p>
+    <p id="tilesExploded">Tiles Exploded:</p>
+    <p id="grassSprayed">Grass Sprayed:</p>
+    <p id="currentNumberOfGrass">Current Number of Grass:</p>
+
+    <h2 id="weather">Spring</h2>
+
+    <button onclick="tigerShowdown()" >Tiger Showdown</button>
+    <button onclick="grassDay()">Spread Grass</button>
+    <button onclick="burnTheWorld()">BURN THE WORLD!</button>
+
+    <p></p>
+
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.14/p5.js"></script>
+    <script src="script.js"></script>
+    
+
+</body>
 </html>

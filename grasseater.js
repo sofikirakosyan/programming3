@@ -1,95 +1,77 @@
 let Grass = require('./grass');
-
 module.exports = class GrassEater extends Grass {
-    constructor(x, y, index) {
-        super(x, y, index);
-        this.energy = 18;
-        this.directions = [];
-    }
-    getNewCoordinates() {
-        this.directions = [
-            [this.x - 1, this.y - 1],
-            [this.x, this.y - 1],
-            [this.x + 1, this.y - 1],
-            [this.x - 1, this.y],
-            [this.x + 1, this.y],
-            [this.x - 1, this.y + 1],
-            [this.x, this.y + 1],
-            [this.x + 1, this.y + 1]
-        ];
-    }
-
-    chooseCell(character) {
-        this.getNewCoordinates();
-        return super.chooseCell(character);
-    }
-
-    mul() {
-        var newCell = this.random(this.chooseCell(0));
-
-        if (newCell) {
-
-            var newGrassE = new GrassEater(newCell[0], newCell[1], 2);
-
-            grassEaterArr.push(newGrassE);
-
-            matrix[newCell[1]][newCell[0]] = 2;
-
-        }
-
+    constructor(x, y, gender) {
+        super(x, y, 5);
+        this.energy = 4;
+        this.gender = gender;
+        this.target = 1;
+        this.id = 2;
+        this.moveSpeed +=1;
+        this.multiply += 3;
+        this.weatherChanged(currentWeather)
     }
 
     move() {
-        if (this.energy > 0) {
-            this.energy--;
-            let emptyCells = this.chooseCell(0)
-            let oneEmptyCell = this.random(emptyCells)
-            if (oneEmptyCell) {
-                matrix[this.y][this.x] = 0;
-                let newX = oneEmptyCell[0]
-                let newY = oneEmptyCell[1]
-                matrix[newY][newX] = 2;
-                this.x = newX;
-                this.y = newY;
+        if (this.energy <= 0) {
+            this.remove(this.x, this.y);
+            return;
+        }
+        if (++this.step < this.moveSpeed) return;
+
+        let target = this.target
+        let coords;
+        do {
+            coords = this.random(this.chooseCell(target--)); 
+        } while (coords == undefined && target >= 0)
+
+        if (target == -1) this.energy--; 
+        else this.energy += target + 1;
+
+        if (coords == undefined) return; 
+
+        let x = coords[0];
+        let y = coords[1];
+
+        if (target != -1) this.remove(x, y, this.id); 
+
+        GlobalMethods.changeMatrix(x, y, this.id, false) 
+        if (this.energy >= this.multiply) {
+            if(this.gender == "female"){
+                this.energy = 4;
+                GlobalMethods.changeMatrix(this.x, this.y, this.id, true) 
             }
+            else{
+                this.energy--; 
+                GlobalMethods.changeMatrix(this.x, this.y, 0, false) 
+            } 
         }
 
+
+        else { 
+            GlobalMethods.changeMatrix(this.x, this.y, 0, false)
+        }
+        this.changeCoords(x, y); 
+
+        this.step = 0;
     }
-    eat() {
-        let grasses = this.chooseCell(1)
-        let oneGrass = this.random(grasses)
-        if (oneGrass) {
-            this.energy++;
-            matrix[this.y][this.x] = 0;
-            let oneGrassX = oneGrass[0];
-            let oneGrassY = oneGrass[1];
-            matrix[oneGrassY][oneGrassX] = 2;
-            this.x = oneGrassX;
-            this.y = oneGrassY;
 
-            for (var i in grassArr) {
-
-                if (oneGrassX == grassArr[i].x && oneGrassY == grassArr[i].y) {
-                    grassArr.splice(i, 1);
-                    break;
-                }
-            }
-
-        } else {
-            this.move()
-            if (this.energy <= 0) {
-                this.die();
-            }
+    weatherChanged(weather){
+        switch(weather){
+            case "Spring":
+                this.moveSpeed -= 1;
+                this.multiply -= 3;
+                return;
+            case "Summer":
+                this.moveSpeed -= 1;
+                this.multiply -= 3;
+                return;
+            case "Fall":
+                this.moveSpeed += 1;
+                this.multiply += 3;
+                return;
+            case "Winter":
+                this.moveSpeed += 1;
+                this.multiply += 3;
         }
     }
-    die() {
-        matrix[this.y][this.x] = 0
-        for (var i in grassEaterArr) {
-            if (this.x == grassEaterArr[i].x && this.y == grassEaterArr[i].y) {
-                grassEaterArr.splice(i, 1);
-                break;
-            }
-        }
-    }
-
 }

@@ -1,186 +1,287 @@
-var express = require('express');
+
+var express = require("express");
 var app = express();
-var server = require('http').createServer(app);
-var io = require('socket.io')(server);
+var server = require("http").createServer(app);
+var io = require("socket.io")(server);
 
-app.use(express.static("."));
+app.use(express.static("../programming_3"));
 
-app.get('/', function (req, res) {
-   res.redirect('index.html');
+app.get("/", function(req, res){
+   res.redirect("index.html")
 });
 
-server.listen(3000);
+server.listen(3000, function(){
+   
+});
 
-function randomNum(min, max) {
-   let result = Math.floor(Math.random() * (max + min) - min);
-   return result;
+
+const Weather = {
+   Spring: "Spring",
+   Summer: "Summer",
+   Fall: "Fall",
+   Winter: "Winter"
 }
-let Grass = require('./Grass');
-let GrassEater = require('./GrassEater');
-let predator = require('./predator');
-let Bomb = require('./Bomb');
-let Tiger = require('./Tiger');
-let Time = require('./Time');
+
+currentWeather = Weather.Spring
+currentFrame = 0;
+
+var framRate = 10;
+
+xLength = 50;
+yLength = 50;
 
 matrix = [];
-grassArr = [];
-grassEaterArr = [];
-predatorArr = [];
-tigerArr = [];
-bombArr = [];
-timeArr = [];
 
-function createCanvas() {
-   function MatrixGenerator(size, countGrass, countGrassEater, predatorCount, tigerCount, bombCount, timeCount) {
-      for (let y = 0; y < size; y++) {
+objects = [];
+
+
+let Grass = require("./Grass")
+let GrassEater = require("./GrassEater")
+let Predator = require("./Predator")
+let Tiger = require("./tiger")
+let Bomb = require("./Bomb")
+let Time = require("./Time")
+let Fire = require("./Fire");
+
+grassEaten = 0
+grassBurnt = 0
+grassEaterEaten = 0
+tilesExploded = 0
+grassSprayed = 0;
+currentNumberOfGrass = 0;
+
+GlobalMethods = {
+  classify : function(number, x, y){
+      switch(number){
+          case 0:
+              return null;
+          case 1:
+            currentNumberOfGrass++;
+              return new Grass(x,y);
+          case 2:
+             var genderChooser = Math.random();
+             if(genderChooser < 0.4) return new GrassEater(x,y, "male") //40% chance of male
+             else return new GrassEater(x,y, "female"); //60% chance of female
+              
+          case 3:
+            var genderChooser = Math.random();
+            if(genderChooser < 0.4) return new Predator(x,y, "male") //40% chance of male
+            else return new Predator(x,y, "female"); //60% chance of female
+          case 4:
+              return new Tiger(x,y);
+          case 5:
+              return new Bomb(x,y);
+          case 98:
+              return new Fire(x,y);
+      }
+   },
+
+   changeMatrix: function(x, y, value, spread, remover = -1){
+      if(matrix[y][x] == 1){
+         if(remover == 2 || remover == 3)
+            grassEaten++;
+         
+         else if(remover == 98)
+            grassBurnt++;
+      }
+
+      else if(matrix[y][x] == 2){
+         if(remover == 3)
+            grassEaterEaten++;
+      }
+
+       matrix[y][x] = value;
+       if(spread == true && value != 0) objects.push(GlobalMethods.classify(value, x, y));
+   },
+
+   deleteObject: function(x,y){
+      for(var i in objects){
+         if(x == objects[i].x && y == objects[i].y){
+            if(objects[i].id == 1) currentNumberOfGrass--;
+            objects.splice(i,1);
+            break; 
+         }
+      }
+   }
+}
+
+function isValid(x,y){
+   return x >= 0 && y >= 0 && y < matrix.length && x < matrix[y].length;
+}
+
+function createCanvas(){
+   console.log("A user joined!")
+   for (let y = 0; y < yLength; y++) {
          matrix.push([])
-         for (var x = 0; x < size; x++) {
-            matrix[y].push(0)
+         for (let x = 0; x < xLength; x++) {
+            let number = Math.random() * 100
+            if(number < 5) number = 0; 
+            else if(number < 90) number = 1; //grass
+            else if(number < 97) number = 2; //grassEater
+            else if(number < 99) number = 3; //predator
+            else if(number < 99.5) number = 4; //tiger
+            else number = 5; //bomb
+            matrix[y].push(number);
+
+            let object = GlobalMethods.classify(number, x, y);
+            if(object != null) objects.push(object);
+            
          }
-      }
-      for (let k = 0; k < countGrass; k++) {
-         let x = (randomNum(0, size))
-         let y = (randomNum(0, size))
-         console.log(x, y)
-         if (matrix[y][x] == 0) {
-            matrix[y][x] = 1
-         }
-         // else {
-         //     k--
-         // }
-      }
-      for (let k = 0; k < countGrassEater; k++) {
-         let x = (randomNum(0, size))
-         let y = (randomNum(0, size))
-         if (matrix[y][x] == 0) {
-            matrix[y][x] = 2;
-         }
-         // else {
-         //     k--
-         // }
-      }
-      for (let k = 0; k < predatorCount; k++) {
-         let x = (randomNum(0, size))
-         let y = (randomNum(0, size))
-         if (matrix[y][x] == 0) {
-            matrix[y][x] = 3
-         }
-         // else {
-         //     k--
-         // }
-      }
-      for (let k = 0; k < tigerCount; k++) {
-         let x = (randomNum(0, size))
-         let y = (randomNum(0, size))
-         if (matrix[y][x] == 0) {
-            matrix[y][x] = 4
-         }
-         // else {
-         //     k--
-         // }
-      }
-      for (let k = 0; k < bombCount; k++) {
-         let x = (randomNum(0, size))
-         let y = (randomNum(0, size))
-         if (matrix[y][x] == 0) {
-            matrix[y][x] = 5;
-         }
-         // else {
-         //     k--
-         // }
-      }
-      for (let k = 0; k < timeCount; k++) {
-         let x = (randomNum(0, size))
-         let y = (randomNum(0, size))
-         if (matrix[y][x] == 0) {
-            matrix[y][x] = 6;
-         }
-         //else {
-         //k--
-         //}
-      }
    }
 
-
-
-   MatrixGenerator(40, 35, 28, 19, 14, 20, 5);
-
-
-   for (var y = 0; y < matrix.length; y++) {
-      for (var x = 0; x < matrix[y].length; x++) {
-         if (matrix[y][x] == 1) {
-            let gr = new Grass(x, y, 1);
-            grassArr.push(gr);
-         }
-         else if (matrix[y][x] == 2) {
-            let gre = new GrassEater(x, y, 2)
-            grassEaterArr.push(gre);
-         }
-         else if (matrix[y][x] == 3) {
-            var gre = new predator(x, y, 3)
-            predatorArr.push(gre);
-         }
-         else if (matrix[y][x] == 4) {
-            var gre = new Tiger(x, y, 4)
-            tigerArr.push(gre);
-         }
-         else if (matrix[y][x] == 5) {
-            var bom = new Bomb(x, y, 5)
-            bombArr.push(bom);
-         }
-         else if (matrix[y][x] == 6) {
-            var time = new Time(x, y, 6)
-            timeArr.push(time);
-         }
-      }
-      return matrix;
-   }
+   io.emit("updateWholeRect", matrix)
+   
 }
 
-function playGame() {
-   for (let i in grassArr) {
-      grassArr[i].mul()
-   }
-   for (let i in grassEaterArr) {
-      grassEaterArr[i].eat()
+function drawGame(){
+   updateWeather()
+   for(let i in objects){
+      objects[i].move();
    }
 
-   for (let i in predatorArr) {
-      predatorArr[i].eat()
-   }
-   for (let i in tigerArr) {
-      tigerArr[i].eat()
-   }
-   for (let i in bombArr) {
-      bombArr[i].eat()
-   }
-   for (let i in timeArr) {
-      timeArr[i].eat()
-   }
-   io.emit("matrix", matrix)
+   io.emit("updateWholeRect", matrix)
+
+   io.emit("statistics", [grassEaten,grassBurnt,grassEaterEaten,tilesExploded,grassSprayed,currentNumberOfGrass])
+
    return matrix;
+
+}
+
+function updateWeather(){
+   currentFrame += 1;
+   if(currentFrame == 0){
+      currentWeather = Weather.Spring;
+      io.emit("updateWeather", currentWeather)
+      updateObjectsWeather()
+   } 
+   else if(currentFrame == 50){
+      currentWeather = Weather.Summer
+      io.emit("updateWeather", currentWeather)
+      updateObjectsWeather()
+   }
+   else if(currentFrame == 100){
+      currentWeather = Weather.Fall
+      io.emit("updateWeather", currentWeather)
+      updateObjectsWeather()
+   }
+   else if(currentFrame == 150){
+      currentFrame = -50
+      currentWeather = Weather.Winter
+      io.emit("updateWeather", currentWeather)
+      updateObjectsWeather()
+   }
+}
+
+function updateObjectsWeather(){
+   saveStatistics()
+   for(var i in objects){
+      objects[i].weatherChanged(currentWeather)
+   }
+}
+
+function saveStatistics(){
+   let statistics ={
+      "grassEaten" : grassEaten,
+      "grassBurnt" : grassBurnt,
+      "grassEaterEaten" : grassEaterEaten,
+      "tilesExploded" : tilesExploded,
+      "grassSprayed" : grassSprayed,
+      "currentNumberOfGrass" : currentNumberOfGrass,
+   }
+
+   var stringifiedStats = JSON.stringify(statistics);
+
+   var fs = require('fs');
+   fs.writeFile("statistics.json", stringifiedStats, function(err, result) {
+      if(err) console.log('error', err);
+   });
 }
 
 
-setInterval(playGame, 1000);
+setInterval(drawGame, 1000/framRate)
+clearInterval()
 
-createCanvas()
+io.on("connection", function(socket){
+   grassEaten = 0;
+   grassBurnt = 0;
+   grassEaterEaten = 0;
+   tilesExploded = 0;
+   grassSprayed = 0;
+   currentNumberOfGrass = 0;
+   matrix = [];
+   objects = [];
+   createCanvas()
+   socket.emit("initial", matrix)
 
-io.on("connection", function (socket) {
-   socket.emit('matrix', matrix);
-});
+   socket.on("disconnect", function(){
+      console.log("A user left!")
+      saveStatistics()
+   });
 
+   socket.on("onCheatClicked", function(x, y, radius, toIndex){
+      if(!isValid(x,y)) return
+      var spread = toIndex > 0;
 
+      for(var yy = y - radius; yy <= y + radius; yy++){
+         for(var xx = x - radius; xx <= x + radius; xx++){
+            if(isValid(xx,yy)){
+               if(matrix[yy][xx] != 0){
+                  GlobalMethods.deleteObject(xx,yy)
+               }
+               GlobalMethods.changeMatrix(xx,yy, toIndex, spread);
+            }
+         }
+      }
+      io.emit("updateWholeRect", matrix)
+      
+   });
+   
+   socket.on("tigerShowdown", function(){
+      for(var i in objects){
+         if(objects[i].id == 4){
+            objects[i].goHam()
+         }
+      }
+   })
 
-// let obj = {
-//    1: grassArr
-//    2: grassEaterArr
-//    3: predatorArr
-//    4: tigerArr
-//    5: bombArr
-//    6: timeArr
-// }
-// socket.emit("size",1)
+   socket.on("grassDay", function(){
+      for (let y = 0; y < yLength; y++) {
+         for (let x = 0; x < xLength; x++) {
+            if(matrix[y][x] == 0){
+               var rand = Math.random() * 100;
+               if(rand < 30){ 
+                  matrix[y][x] = 1;
+                  objects.push(GlobalMethods.classify(1, x, y));
+               }
+            }
+         }
 
+      }
+   })
 
+   socket.on("burnTheWorld", function(){
+      for (let y = 0; y < yLength; y++) {
+         for (let x = 0; x < xLength; x++) {
+            if(x == 0 || y == 0 || x == xLength - 1 || y == yLength - 1){ 
+               if(matrix[y][x] != 0){
+                  GlobalMethods.deleteObject(x,y)
+               }
+               matrix[y][x] = 98
+               objects.push(GlobalMethods.classify(98,x,y))
+            }
 
+            else if(matrix[y][x] == 1){
+               var rand = Math.random() * 100;
+               if(rand < 10){ 
+                  GlobalMethods.deleteObject(x,y)
+
+                  matrix[y][x] = 98;
+                  objects.push(GlobalMethods.classify(98, x, y));
+               }
+            }
+         }
+
+      }
+   })
+   
+})
